@@ -1,16 +1,44 @@
-var http = require("http");
-var url = require("url");
+/**
+ * Module dependencies.
+ */
 
-function start(route) {
-  function onRequest(request, response) {
-    var pathname = url.parse(request.url).pathname;
-    console.log("Request for " + pathname + " received.");
+var express = require('express')
+  , routes = require('./routes')
+  , user = require('./routes/user')
+  , http = require('http')
+  , path = require('path');
 
+<<<<<<< HEAD
     route(request,response);
   }
+=======
+var servo = require('servoControl');
 
-  http.createServer(onRequest).listen(8888);
-  console.log("Server has started.");
-}
+var app = express();
+>>>>>>> 7af92dc049cb86670ccebc476a40fc1d7aa5b73b
 
-exports.start = start;
+app.configure(function(){
+  app.set('port', process.env.PORT || 3000);
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'jade');
+  app.use(express.favicon());
+  app.use(express.logger('dev'));
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
+  app.use(app.router);
+  app.use(express.static(path.join(__dirname, 'public')));
+});
+
+app.configure('development', function(){
+  app.use(express.errorHandler());
+});
+
+app.get('/', routes.index);
+app.get('/users', user.list);
+app.get('/blink', servo.blink);
+app.get('/blink/:interval', servo.blinkInterval);
+app.get('/turnRight', servo.turnRight);
+
+http.createServer(app).listen(app.get('port'), function(){
+  console.log("Express server listening on port " + app.get('port'));
+});
